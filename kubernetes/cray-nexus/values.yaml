@@ -16,6 +16,7 @@ sonatype-nexus:
     type: Recreate
 
   nexus:
+    priorityClassName: "csm-high-priority-service"
     imageName: sonatype/nexus3
     imageTag: 3.25.0
     env:
