@@ -22,9 +22,24 @@ sonatype-nexus:
     env:
     # See https://help.sonatype.com/repomanager3/installation/system-requirements#SystemRequirements-Memory
     - name: install4jAddVmParams
-      value: "-Xms4G -Xmx4G -XX:MaxDirectMemorySize=39158M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      value: "-Xms4G -Xmx4G -XX:MaxDirectMemorySize=39158M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djavax.net.ssl.trustStore=/nexus-data/cacerts"
     - name: NEXUS_SECURITY_RANDOMPASSWORD
       value: "false"
+    - name: KC_AUTH_URL
+      valueFrom:
+        secretKeyRef:
+          key: endpoint
+          name: system-nexus-client-auth
+    - name: KC_CLIENT_ID
+      valueFrom:
+        secretKeyRef:
+          key: client-id
+          name: system-nexus-client-auth
+    - name: KC_CLIENT_CRED
+      valueFrom:
+        secretKeyRef:
+          key: client-secret
+          name: system-nexus-client-auth
     resources:
       requests:
         cpu: "4"
@@ -45,6 +60,8 @@ sonatype-nexus:
       helm.sh/resource-policy: keep
 
   deployment:
+    postStart:
+      command: ["/usr/local/bin/initialize-keycloak-plugin"]
     additionalVolumes:
     - name: nexus-config
       configMap:
