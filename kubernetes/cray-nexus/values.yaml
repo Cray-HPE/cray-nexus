@@ -66,6 +66,12 @@ sonatype-nexus:
     - name: nexus-config
       configMap:
         name: nexus-config
+    - name: ca-public-key
+      configMap:
+        name: cray-configmap-ca-public-key
+    additionalVolumeMounts:
+    - mountPath: /ca_public_key
+      name: ca-public-key
     initContainers:
     - name: init-data
       image: dtr.dev.cray.com/baseos/busybox:1
@@ -85,6 +91,8 @@ sonatype-nexus:
         name: nexus-data
       - mountPath: /nexus-config
         name: nexus-config
+      - mountPath: /ca_public_key
+        name: ca-public-key
 
   service:
     enabled: true
@@ -160,7 +168,7 @@ init:
   enabled: true
   image:
     repository: dtr.dev.cray.com/cray/cray-nexus-setup
-    tag: 0.3.2
+    tag: 0.5.3
     pullPolicy: IfNotPresent
   adminCredentials:
     enabled: false
