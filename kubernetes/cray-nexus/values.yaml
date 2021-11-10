@@ -21,7 +21,7 @@ sonatype-nexus:
     imageTag: 3.25.0
     env:
     # See https://help.sonatype.com/repomanager3/installation/system-requirements#SystemRequirements-Memory
-    - name: install4jAddVmParams
+    - name: INSTALL4J_ADD_VM_PARAMS
       value: "-Xms4G -Xmx4G -XX:MaxDirectMemorySize=39158M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djavax.net.ssl.trustStore=/nexus-data/cacerts"
     - name: NEXUS_SECURITY_RANDOMPASSWORD
       value: "false"
@@ -151,18 +151,19 @@ istio:
                 X-WEBAUTH-USER: admin
               remove:
               - Authorization
-      # UI ingress should come from keycloak-gatekeeper
+      # Do not use the X-WEBAUTH-USER header because login credentials
+      # are verified by the Nexus Keycloak plugin.
       ui:
         enabled: false
         authority: nexus.local
         routes:
         - port: 80
-          headers:
-            request:
-              add:
-                X-WEBAUTH-USER: admin
-              remove:
-              - Authorization
+      #    headers:
+      #      request:
+      #        add:
+      #          X-WEBAUTH-USER: admin
+      #        remove:
+      #        - Authorization
 
 init:
   enabled: true
