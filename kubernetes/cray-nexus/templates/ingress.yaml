@@ -10,8 +10,10 @@ metadata:
   labels:
 {{ include "cray-nexus.labels" . | indent 4 }}
 spec:
+  {{- with .Values.istio.ingress.gateway }}
   gateways:
-  - {{ .Values.istio.ingress.gateway | quote }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   hosts:
   {{- range .Values.istio.ingress.hosts }}
   {{- if .enabled }}
