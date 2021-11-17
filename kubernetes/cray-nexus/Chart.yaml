@@ -1,13 +1,24 @@
 # Copyright 2020, Cray Inc.
 ---
-apiVersion: v1
+apiVersion: v2
 name: cray-nexus
 version: 0.8.0
 description: Sonatype Nexus is an open source repository manager
-appVersion: 3.25.0
-home: "spet/cray-charts"
+keywords:
+  - sonatype
+  - nexus
+  - repository
+  - management
+home: https://github.com/Cray-HPE/cray-nexus
 sources:
-  - https://github.com/sonatype/nexus-public
-  - https://github.com/travelaudience/docker-nexus
-  - https://github.com/travelaudience/kubernetes-nexus
-  - https://github.com/travelaudience/docker-nexus-backup
+  - https://github.com/Oteemo/charts
+dependencies:
+  - name: sonatype-nexus
+    version: 2.3.1
+    repository: https://oteemo.github.io/charts/
+maintainers:
+  - name: rnoska-hpe
+icon: https://raw.githubusercontent.com/sonatype/nexus-public/release-3.25.0-03/components/nexus-rapture/src/main/resources/static/rapture/resources/icons/x100/nexus-black.png
+appVersion: 3.25.0
+annotations:
+  artifacthub.io/license: MIT

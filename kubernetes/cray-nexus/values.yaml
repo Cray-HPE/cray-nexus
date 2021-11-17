@@ -17,7 +17,7 @@ sonatype-nexus:
 
   nexus:
     priorityClassName: "csm-high-priority-service"
-    imageName: sonatype/nexus3
+    imageName: artifactory.algol60.net/csm-docker/stable/nexus3
     imageTag: 3.25.0
     env:
     # See https://help.sonatype.com/repomanager3/installation/system-requirements#SystemRequirements-Memory
@@ -74,9 +74,9 @@ sonatype-nexus:
       name: ca-public-key
     initContainers:
     - name: init-data
-      image: dtr.dev.cray.com/baseos/busybox:1
+      image: artifactory.algol60.net/csm-docker/stable/nexus3:3.25.0
       command:
-      - bin/sh
+      - /bin/sh
       - -c
       - |
         if [ -z "$(ls -A /nexus-data/*)" ]; then
@@ -165,7 +165,7 @@ istio:
 init:
   enabled: true
   image:
-    repository: dtr.dev.cray.com/cray/cray-nexus-setup
+    repository: artifactory.algol60.net/csm-docker/stable/cray-nexus-setup
     tag: 0.5.3
     pullPolicy: IfNotPresent
   adminCredentials:
