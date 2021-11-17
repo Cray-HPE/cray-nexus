@@ -102,7 +102,10 @@ sonatype-nexus:
 istio:
   enabled: true
   ingress:
-    gateway: services/services-gateway
+    gateway: 
+    - "services/services-gateway"
+    - "services/customer-admin-gateway"
+    - "services/customer-user-gateway"
     hosts:
       packages:
         enabled: true
