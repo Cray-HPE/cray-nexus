@@ -49,7 +49,6 @@ spec:
             nexus-enable-anonymous-access >&2
             nexus-remove-default-repos >&2
             nexus-enable-rut-auth >&2
-            nexus-enable-keycloak-realm >&2
 
             {{- if .Values.init.adminCredentials.enabled }}
             echo "$NEXUS_ADMIN_PASSWORD" | nexus-change-password admin >&2
