@@ -21,10 +21,25 @@ sonatype-nexus:
     imageTag: 3.25.0
     env:
     # See https://help.sonatype.com/repomanager3/installation/system-requirements#SystemRequirements-Memory
-    - name: install4jAddVmParams
-      value: "-Xms4G -Xmx4G -XX:MaxDirectMemorySize=39158M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+    - name: INSTALL4J_ADD_VM_PARAMS
+      value: "-Xms4G -Xmx4G -XX:MaxDirectMemorySize=39158M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djavax.net.ssl.trustStore=/nexus-data/cacerts"
     - name: NEXUS_SECURITY_RANDOMPASSWORD
       value: "false"
+    - name: KC_AUTH_URL
+      valueFrom:
+        secretKeyRef:
+          key: endpoint
+          name: system-nexus-client-auth
+    - name: KC_CLIENT_ID
+      valueFrom:
+        secretKeyRef:
+          key: client-id
+          name: system-nexus-client-auth
+    - name: KC_CLIENT_CRED
+      valueFrom:
+        secretKeyRef:
+          key: client-secret
+          name: system-nexus-client-auth
     resources:
       requests:
         cpu: "4"
@@ -45,10 +60,18 @@ sonatype-nexus:
       helm.sh/resource-policy: keep
 
   deployment:
+    postStart:
+      command: ["/usr/local/bin/initialize-keycloak-plugin"]
     additionalVolumes:
     - name: nexus-config
       configMap:
         name: nexus-config
+    - name: ca-public-key
+      configMap:
+        name: cray-configmap-ca-public-key
+    additionalVolumeMounts:
+    - mountPath: /ca_public_key
+      name: ca-public-key
     initContainers:
     - name: init-data
       image: dtr.dev.cray.com/baseos/busybox:1
@@ -68,6 +91,8 @@ sonatype-nexus:
         name: nexus-data
       - mountPath: /nexus-config
         name: nexus-config
+      - mountPath: /ca_public_key
+        name: ca-public-key
 
   service:
     enabled: true
@@ -129,24 +154,19 @@ istio:
                 X-WEBAUTH-USER: admin
               remove:
               - Authorization
-      # UI ingress should come from keycloak-gatekeeper
+      # Do not use the X-WEBAUTH-USER header because login credentials
+      # are verified by the Nexus Keycloak plugin.
       ui:
         enabled: false
         authority: nexus.local
         routes:
         - port: 80
-          headers:
-            request:
-              add:
-                X-WEBAUTH-USER: admin
-              remove:
-              - Authorization
 
 init:
   enabled: true
   image:
     repository: dtr.dev.cray.com/cray/cray-nexus-setup
-    tag: 0.3.2
+    tag: 0.5.3
     pullPolicy: IfNotPresent
   adminCredentials:
     enabled: false
