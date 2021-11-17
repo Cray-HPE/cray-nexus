@@ -114,15 +114,15 @@ sonatype-nexus:
     persistence:
       enabled: false
 
-#additionalServices:  # For testing only when no keycloak is around
-#  # Do not use the key "service". It is reserved for the service included in
-#  # sonatype-nexus.
-#  can:
-#    enabled: true
-#    type: LoadBalancer
-#    annotations:
-#      external-dns.alpha.kubernetes.io/hostname: nexus.local
-#      metallb.universe.tf/address-pool: customer-access
+# additionalServices:  # For testing only when no keycloak is around
+#   # Do not use the key "service". It is reserved for the service included in
+#   # sonatype-nexus.
+#   can:
+#     enabled: true
+#     type: LoadBalancer
+#     annotations:
+#       external-dns.alpha.kubernetes.io/hostname: nexus.local
+#       metallb.universe.tf/address-pool: customer-access
 
 istio:
   enabled: true
@@ -173,4 +173,3 @@ init:
     secret: nexus-admin-credentials
 
 sealedSecrets: []
-
