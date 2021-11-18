@@ -9,12 +9,12 @@ chart: chart_setup chart_package chart_test
 
 
 chart_setup:
-		mkdir -p ${CHART_PATH}/.packaged
+	mkdir -p ${CHART_PATH}/.packaged
 
 chart_package:
-		helm dep up ${CHART_PATH}/${NAME}
-		helm package ${CHART_PATH}/${NAME} -d ${CHART_PATH}/.packaged --version ${CHART_VERSION}
+	helm dep up ${CHART_PATH}/${NAME}
+	helm package ${CHART_PATH}/${NAME} -d ${CHART_PATH}/.packaged --version ${CHART_VERSION}
 
 chart_test:
-		helm lint "${CHART_PATH}/${NAME}"
-		docker run --rm -v ${PWD}/${CHART_PATH}:/apps ${HELM_UNITTEST_IMAGE} -3 ${NAME}
+	helm lint "${CHART_PATH}/${NAME}"
+	docker run --rm -v ${PWD}/${CHART_PATH}:/apps ${HELM_UNITTEST_IMAGE} -3 ${NAME}
