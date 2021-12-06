@@ -18,7 +18,7 @@ sonatype-nexus:
   nexus:
     priorityClassName: "csm-high-priority-service"
     imageName: artifactory.algol60.net/csm-docker/stable/nexus3
-    imageTag: 3.25.0
+    imageTag: 3.25.0-1
     env:
     # See https://help.sonatype.com/repomanager3/installation/system-requirements#SystemRequirements-Memory
     - name: INSTALL4J_ADD_VM_PARAMS
@@ -74,7 +74,7 @@ sonatype-nexus:
       name: ca-public-key
     initContainers:
     - name: init-data
-      image: artifactory.algol60.net/csm-docker/stable/nexus3:3.25.0
+      image: artifactory.algol60.net/csm-docker/stable/nexus3:3.25.0-1
       command:
       - /bin/sh
       - -c
