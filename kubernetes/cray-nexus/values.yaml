@@ -1,14 +1,13 @@
-# Copyright 2020, Cray Inc.
-# Cray Nexus Helm Chart
+# Copyright 2022 Hewlett Packard Enterprise Development LP
 
 # Base sonatype-nexus chart values
 # See https://github.com/Oteemo/charts/tree/master/charts/sonatype-nexus#configuration
 # for Nexus base chart configuration information
 sonatype-nexus:
 
-  # These overrides are very, very critical as it enables the "init-data"
-  # initContainer (see below) to be able to correctly mount the data volume
-  # in order to successfully initialize it.
+  # These overrides are very, very critical as it enables the "init"
+  # initContainer (see below) to be able to correctly mount the nexus-data
+  # volume in order to successfully initialize it.
   nameOverride: nexus
   fullnameOverride: nexus
 
@@ -18,31 +17,16 @@ sonatype-nexus:
   nexus:
     priorityClassName: "csm-high-priority-service"
     imageName: artifactory.algol60.net/csm-docker/stable/nexus3
-    imageTag: 3.25.0-1
+    imageTag: 3.25.0-2
     env:
     # See https://help.sonatype.com/repomanager3/installation/system-requirements#SystemRequirements-Memory
     - name: INSTALL4J_ADD_VM_PARAMS
       value: "-Xms4G -Xmx4G -XX:MaxDirectMemorySize=39158M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djavax.net.ssl.trustStore=/nexus-data/cacerts"
     - name: NEXUS_SECURITY_RANDOMPASSWORD
       value: "false"
-    - name: KC_AUTH_URL
-      valueFrom:
-        secretKeyRef:
-          key: endpoint
-          name: system-nexus-client-auth
-    - name: KC_CLIENT_ID
-      valueFrom:
-        secretKeyRef:
-          key: client-id
-          name: system-nexus-client-auth
-    - name: KC_CLIENT_CRED
-      valueFrom:
-        secretKeyRef:
-          key: client-secret
-          name: system-nexus-client-auth
     resources:
       requests:
-        cpu: "4"
+        cpu: 500m
         memory: 12Gi
       limits:
         cpu: "12"
@@ -60,21 +44,25 @@ sonatype-nexus:
       helm.sh/resource-policy: keep
 
   deployment:
-    postStart:
-      command: ["/usr/local/bin/initialize-keycloak-plugin"]
     additionalVolumes:
     - name: nexus-config
       configMap:
         name: nexus-config
+    - name: keycloak-realm-config
+      secret:
+        secretName: nexus-keycloak-realm-config
     - name: ca-public-key
       configMap:
         name: cray-configmap-ca-public-key
     additionalVolumeMounts:
-    - mountPath: /ca_public_key
-      name: ca-public-key
+    - name: keycloak-realm-config
+      mountPath: /opt/sonatype/nexus/etc
+      readOnly: true
+    - name: ca-public-key
+      mountPath: /ca_public_key
     initContainers:
-    - name: init-data
-      image: artifactory.algol60.net/csm-docker/stable/nexus3:3.25.0-1
+    - name: init
+      image: artifactory.algol60.net/csm-docker/stable/nexus3:3.25.0-2
       command:
       - /bin/sh
       - -c
@@ -85,14 +73,21 @@ sonatype-nexus:
             chown -Rv 200:200 /nexus-data
             chmod -Rv u+rwX,go+rX,go-w /nexus-data
         fi
+        # Always start with a fresh trust store
+        rm -f /nexus-data/cacerts
+        # Create new trust store with all /ca_public_key certs
+        /usr/local/bin/create-trust-store.sh /nexus-data/cacerts /ca_public_key/*
+        # Update owner
+        chown -v 200:200 /nexus-data/cacerts
+        # Remove write permissions
+        chmod -v ugo-w /nexus-data/cacerts
       volumeMounts:
-      - mountPath: /nexus-data
-        # See the above note regarding nameOverride and fullnameOverride
-        name: nexus-data
-      - mountPath: /nexus-config
-        name: nexus-config
-      - mountPath: /ca_public_key
-        name: ca-public-key
+      - name: nexus-data  # See the above note regarding nameOverride and fullnameOverride
+        mountPath: /nexus-data
+      - name: nexus-config
+        mountPath: /nexus-config
+      - name: ca-public-key
+        mountPath: /ca_public_key
 
   service:
     enabled: true
@@ -132,6 +127,8 @@ istio:
     - "services/customer-admin-gateway"
     - "services/customer-user-gateway"
     hosts:
+      # NOTE Specifically remove the X-WEBAUTH-USER header to prevent previous
+      # Nexus configurations from automatically authenticating clients.
       packages:
         enabled: true
         authority: packages.local
@@ -139,10 +136,8 @@ istio:
         - port: 80
           headers:
             request:
-              add:
-                X-WEBAUTH-USER: admin
               remove:
-              - Authorization
+              - X-WEBAUTH-USER
       registry:
         enabled: true
         authority: registry.local
@@ -150,26 +145,56 @@ istio:
         - port: 5003
           headers:
             request:
-              add:
-                X-WEBAUTH-USER: admin
               remove:
-              - Authorization
-      # Do not use the X-WEBAUTH-USER header because login credentials
-      # are verified by the Nexus Keycloak plugin.
+              - X-WEBAUTH-USER
       ui:
         enabled: false
         authority: nexus.local
         routes:
         - port: 80
+          headers:
+            request:
+              remove:
+              - X-WEBAUTH-USER
 
-init:
+setup:
   enabled: true
   image:
     repository: artifactory.algol60.net/csm-docker/stable/cray-nexus-setup
-    tag: 0.5.3
+    tag: 0.6.0
     pullPolicy: IfNotPresent
-  adminCredentials:
+  adminCredential:
+    # Not enabled by default as the secret must be pre-created via e.g., a sealed secret
     enabled: false
-    secret: nexus-admin-credentials
+    secret: nexus-admin-credential
+
+security:
+  anonymousAccess:
+    enabled: true
+  rutAuth:  # Remote User Token (RUT) Authentication
+    enabled: false
+  docker:
+    enabled: true
+  keycloak:
+    enabled: true
+    secretName: nexus-keycloak-realm-config  # See volume mount above
+    config:
+      realm: shasta
+      auth-server-url: https://api-gw-service-nmn.local/keycloak/realms/shasta/protocol/openid-connect/token/  # $secret.endpoint
+      ssl-required: external
+      resource: system-nexus-client  # $secret.client-id
+      verify-token-audience: true
+      credentials:
+        secret: null  # $secret.client-secret, defaults to a new UUID
+      use-resource-role-mappings: true
+      confidential-port: 0
+      policy-enforcer: {}
+    client:
+      # Kubernetes secret (from Keycloak setup) expected to contain endpoint,
+      # client-id, and client-secret data which overrides auth-server-url,
+      # resource, and credentials.secret configs.
+      secret:
+        name: system-nexus-client-auth
+        # namespace defaults to .Release.Namespace
 
 sealedSecrets: []

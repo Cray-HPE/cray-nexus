@@ -1,0 +1,132 @@
+{{- if .Values.setup.enabled }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "cray-nexus.fullname" . }}-init
+  labels:
+    nexus: setup
+{{ include "cray-nexus.labels" . | indent 4 }}
+  annotations:
+    helm.sh/hook: post-install
+    helm.sh/hook-weight: "-10"
+    helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation
+spec:
+  template:
+    metadata:
+      name: {{ template "cray-nexus.fullname" . }}-init
+      labels:
+{{ include "cray-nexus.labels" . | indent 8 }}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: nexus-init
+          image: "{{ .Values.setup.image.repository }}:{{ .Values.setup.image.tag }}"
+          imagePullPolicy: "{{ .Values.setup.image.pullPolicy }}"
+          env:
+          - name: NEXUS_URL
+            value: http://nexus
+          {{- if .Values.setup.adminCredential.enabled }}
+          - name: NEXUS_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Values.setup.credential.secret }}"
+                key: password
+          {{- end }}
+          command:
+          - /bin/bash
+          - -c
+          - |-
+            set -x
+
+            while ! nexus-ready; do
+                echo >&2 "trying again in 10 seconds"
+                sleep 10
+            done
+
+            set -e
+
+            nexus-remove-default-repos >&2
+
+            {{- if .Values.setup.adminCredential.enabled }}
+            echo "$NEXUS_ADMIN_PASSWORD" | nexus-change-password admin >&2
+            # Subsequent access to the Nexus API requires the setup credential
+            {{- end }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "cray-nexus.fullname" . }}-setup
+  labels:
+    nexus: setup
+{{ include "cray-nexus.labels" . | indent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "0"
+    helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation
+spec:
+  template:
+    metadata:
+      name: {{ template "cray-nexus.fullname" . }}-setup
+      labels:
+{{ include "cray-nexus.labels" . | indent 8 }}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: nexus-init
+          image: "{{ .Values.setup.image.repository }}:{{ .Values.setup.image.tag }}"
+          imagePullPolicy: "{{ .Values.setup.image.pullPolicy }}"
+          env:
+          - name: NEXUS_URL
+            value: http://nexus
+          {{- if .Values.setup.adminCredential.enabled }}
+          - name: NEXUS_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Values.setup.adminCredential.secret }}"
+                key: username
+          - name: NEXUS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Values.setup.adminCredential.secret }}"
+                key: password
+          {{- end }}
+          command:
+          - /bin/bash
+          - -c
+          - |-
+            set -x
+
+            while ! nexus-ready; do
+                echo >&2 "trying again in 10 seconds"
+                sleep 10
+            done
+
+            set -e
+
+            nexus-upload-script /usr/local/share/nexus-setup/groovy/*.groovy >&2
+
+            {{- if .Values.security.keycloak.enabled }}
+            nexus-enable-keycloak-realm >&2
+            {{- else }}
+            nexus-disable-keycloak-realm >&2
+            {{- end }}
+
+            {{- if .Values.security.docker.enabled }}
+            nexus-enable-docker-realm >&2
+            {{- else }}
+            nexus-disable-docker-realm >&2
+            {{- end }}
+
+            {{- if .Values.security.rutAuth.enabled }}
+            nexus-enable-rut-auth >&2
+            {{- else }}
+            nexus-disable-rut-auth >&2
+            {{- end }}
+
+            {{- if .Values.security.anonymousAccess.enabled }}
+            nexus-enable-anonymous-access >&2
+            {{- else }}
+            nexus-disable-anonymous-access >&2
+            {{- end }}
+{{- end }}

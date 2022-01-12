@@ -2,7 +2,7 @@
 ---
 apiVersion: v2
 name: cray-nexus
-version: 0.9.1
+version: 0.10.0
 description: Sonatype Nexus is an open source repository manager
 keywords:
   - sonatype
@@ -19,6 +19,6 @@ dependencies:
 maintainers:
   - name: rnoska-hpe
 icon: https://raw.githubusercontent.com/sonatype/nexus-public/release-3.25.0-03/components/nexus-rapture/src/main/resources/static/rapture/resources/icons/x100/nexus-black.png
-appVersion: 3.25.0-1
+appVersion: 3.25.0-2
 annotations:
   artifacthub.io/license: MIT
