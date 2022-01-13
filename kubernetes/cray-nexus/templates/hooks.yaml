@@ -39,6 +39,7 @@ spec:
           - |-
             set -x
 
+            # Wait for Nexus to be available
             while ! nexus-ready; do
                 echo >&2 "trying again in 10 seconds"
                 sleep 10
@@ -97,6 +98,11 @@ spec:
           - |-
             set -x
 
+            # Configure curl authentication
+            export CURL_HOME="$(mktemp -d)"
+            nexus-curl-auth "$CURL_HOME"
+
+            # Wait for Nexus to be available
             while ! nexus-ready; do
                 echo >&2 "trying again in 10 seconds"
                 sleep 10

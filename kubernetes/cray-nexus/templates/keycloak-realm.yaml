@@ -1,7 +1,7 @@
 {{- if .Values.security.keycloak.enabled }}
 {{- $secret := (lookup "v1" "Secret" (.Values.security.keycloak.client.secret.namespace | default .Release.Namespace) .Values.security.keycloak.client.secret.name -}}
 {{- if $secret }}
-{{- $_ := set .Values.keycloak.config "auth-server-url" (regexReplaceAll "keycloak.*" ($secret.data.endpoint | b64dec) "keycloak") }}
+{{- $_ := set .Values.keycloak.config "auth-server-url" (regexReplaceAll "keycloak/.*" ($secret.data.endpoint | b64dec) "keycloak/") }}
 {{- $_ := set .Values.keycloak.config "resource" (get $secret.data "client-id" | b64dec) }}
 {{- $_ := set .Values.keycloak.config.credentials "secret" (get $secret.data "client-secret" | b64dec) }}
 {{- else }}

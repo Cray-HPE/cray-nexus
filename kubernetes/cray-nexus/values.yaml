@@ -180,7 +180,7 @@ security:
     secretName: nexus-keycloak-realm-config  # See volume mount above
     config:
       realm: shasta
-      auth-server-url: https://api-gw-service-nmn.local/keycloak/realms/shasta/protocol/openid-connect/token/  # $secret.endpoint
+      auth-server-url: https://api-gw-service-nmn.local/keycloak/  # $secret.endpoint
       ssl-required: external
       resource: system-nexus-client  # $secret.client-id
       verify-token-audience: true
