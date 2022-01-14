@@ -125,7 +125,7 @@ spec:
             {{- end }}
 
             {{- if .Values.security.rutAuth.enabled }}
-            nexus-enable-rut-auth >&2
+            nexus-enable-rut-auth {{ .Values.security.rutAuth.httpHeader | quote }} >&2
             {{- else }}
             nexus-disable-rut-auth >&2
             {{- end }}

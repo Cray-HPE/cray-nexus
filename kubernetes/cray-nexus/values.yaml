@@ -173,6 +173,7 @@ security:
     enabled: true
   rutAuth:  # Remote User Token (RUT) Authentication
     enabled: false
+    httpHeader: X-WEBAUTH-USER
   docker:
     enabled: true
   keycloak:
@@ -180,7 +181,7 @@ security:
     secretName: nexus-keycloak-realm-config  # See volume mount above
     config:
       realm: shasta
-      auth-server-url: https://api-gw-service-nmn.local/keycloak/  # $secret.endpoint
+      auth-server-url: https://api-gw-service-nmn.local/keycloak  # $secret.endpoint
       ssl-required: external
       resource: system-nexus-client  # $secret.client-id
       verify-token-audience: true
