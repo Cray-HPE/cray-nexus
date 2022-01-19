@@ -46,7 +46,7 @@ spec:
 
             set -e
 
-            . /usr/local/bin/nexus-ready
+            . "$(command -v nexus-ready)"
 
             # Change default admin password, as necessary
             if curl -sfk "${URL}/v1/status/check"; then
@@ -108,7 +108,7 @@ spec:
 
             set -e
 
-            . /usr/local/bin/nexus-ready
+            . "$(command -v nexus-ready)"
 
             nexus-remove-default-repos >&2
 
@@ -164,7 +164,7 @@ spec:
 
             set -e
 
-            . /usr/local/bin/nexus-ready
+            . "$(command -v nexus-ready)"
 
             nexus-upload-script /usr/local/share/nexus-setup/groovy/*.groovy >&2
 
