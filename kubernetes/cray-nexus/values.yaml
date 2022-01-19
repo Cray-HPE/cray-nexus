@@ -56,7 +56,8 @@ sonatype-nexus:
         name: cray-configmap-ca-public-key
     additionalVolumeMounts:
     - name: keycloak-realm-config
-      mountPath: /opt/sonatype/nexus/etc
+      mountPath: /opt/sonatype/nexus/etc/keycloak.json
+      subPath: keycloak.json
       readOnly: true
     - name: ca-public-key
       mountPath: /ca_public_key
