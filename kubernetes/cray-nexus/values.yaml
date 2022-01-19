@@ -164,8 +164,7 @@ setup:
     tag: 0.6.0
     pullPolicy: IfNotPresent
   adminCredential:
-    # Not enabled by default as the secret must be pre-created via e.g., a sealed secret
-    enabled: false
+    enabled: true
     secret: nexus-admin-credential
 
 security:
