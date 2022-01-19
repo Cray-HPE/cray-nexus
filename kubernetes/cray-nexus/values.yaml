@@ -126,7 +126,6 @@ istio:
     gateway:
     - "services/services-gateway"
     - "services/customer-admin-gateway"
-    - "services/customer-user-gateway"
     hosts:
       # NOTE Specifically remove the X-WEBAUTH-USER header to prevent previous
       # Nexus configurations from automatically authenticating clients.
