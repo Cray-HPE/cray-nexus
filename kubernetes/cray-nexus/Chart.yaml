@@ -44,3 +44,6 @@ icon: https://raw.githubusercontent.com/sonatype/nexus-public/release-3.25.0-03/
 appVersion: 3.25.0
 annotations:
   artifacthub.io/license: MIT
+  artifacthub.io/images: |
+    - name: nexus3
+      image: artifactory.algol60.net/csm-docker/stable/docker.io/sonatype/nexus3:3.25.0
