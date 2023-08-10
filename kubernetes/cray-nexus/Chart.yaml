@@ -24,7 +24,7 @@
 ---
 apiVersion: v2
 name: cray-nexus
-version: 0.11.1
+version: 0.12.0
 description: Sonatype Nexus is an open source repository manager
 keywords:
   - sonatype
@@ -36,14 +36,14 @@ sources:
   - https://github.com/Oteemo/charts
 dependencies:
   - name: sonatype-nexus
-    version: 2.3.1
+    version: 5.5.0
     repository: https://oteemo.github.io/charts/
 maintainers:
-  - name: rnoska-hpe
-icon: https://raw.githubusercontent.com/sonatype/nexus-public/release-3.38.0-01/components/nexus-rapture/src/main/resources/static/rapture/resources/icons/x100/nexus-black.png
-appVersion: 3.38.0-1
+  - name: ndavidson-hpe
+icon: https://raw.githubusercontent.com/sonatype/nexus-public/release-3.58.0-01/components/nexus-rapture/src/main/resources/static/rapture/resources/icons/x100/nexus-black.png
+appVersion: 3.58.0-1
 annotations:
   artifacthub.io/license: MIT
   artifacthub.io/images: |
     - name: nexus3
-      image: artifactory.algol60.net/csm-docker/stable/docker.io/sonatype/nexus3:3.38.0-1
+      image: artifactory.algol60.net/csm-docker/stable/docker.io/sonatype/nexus3:3.58.0-1
