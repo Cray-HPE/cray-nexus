@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2020-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2020-2024 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -39,7 +39,7 @@ sonatype-nexus:
   nexus:
     priorityClassName: "csm-high-priority-service"
     imageName: artifactory.algol60.net/csm-docker/stable/docker.io/sonatype/nexus3
-    imageTag: 3.38.0-1
+    imageTag: 3.67.1-1
     env:
     # See https://help.sonatype.com/repomanager3/installation/system-requirements#SystemRequirements-Memory
     - name: INSTALL4J_ADD_VM_PARAMS
@@ -85,7 +85,7 @@ sonatype-nexus:
       mountPath: /ca_public_key
     initContainers:
     - name: init
-      image: artifactory.algol60.net/csm-docker/stable/docker.io/sonatype/nexus3:3.38.0-1
+      image: artifactory.algol60.net/csm-docker/stable/docker.io/sonatype/nexus3:3.67.1-1
       command:
       - /bin/sh
       - -c
