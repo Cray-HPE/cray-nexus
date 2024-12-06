@@ -1,3 +1,27 @@
+#
+# MIT License
+#
+# (C) Copyright 2020-2024 Hewlett Packard Enterprise Development LP
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+
 # Example Nexus Repository Manager (NXRM) configuration that adds proxy and
 # group "docker" repositories to the default airgap setup provided by
 # cray-nexus-setup.
@@ -29,13 +53,13 @@ charts:
         hosts:
           registry:
             routes:
-	      # Writes goto port 5003 (default registry). NXRM does not (as of
-	      # yet) support pushing to group repositories, see
-	      # https://issues.sonatype.org/browse/NEXUS-10471. Until then, a
-	      # port must be exposed in order to enable images to be pushed to
-	      # this registry. See also, https://stackoverflow.com/a/54590014
-	      # which describes using a reverse proxy to direct writes to the
-	      # desired registry.
+              # Writes goto port 5003 (default registry). NXRM does not (as of
+              # yet) support pushing to group repositories, see
+              # https://issues.sonatype.org/browse/NEXUS-10471. Until then, a
+              # port must be exposed in order to enable images to be pushed to
+              # this registry. See also, https://stackoverflow.com/a/54590014
+              # which describes using a reverse proxy to direct writes to the
+              # desired registry.
               - match:
                 - method:
                     exact: HEAD
