@@ -183,11 +183,19 @@ setup:
   enabled: true
   image:
     repository: artifactory.algol60.net/csm-docker/stable/cray-nexus-setup
-    tag: 0.11.0
+    tag: 0.11.1
     pullPolicy: IfNotPresent
   adminCredential:
     enabled: true
     secret: nexus-admin-credential
+
+hooks:
+  preInstall:
+    image:
+      repository: artifactory.algol60.net/csm-docker/stable/docker-kubectl
+      tag: 1.24.17
+      pullPolicy: IfNotPresent
+    serviceAccountName: nexus-pre-install
 
 security:
   anonymousAccess:
