@@ -183,7 +183,7 @@ setup:
   enabled: true
   image:
     repository: artifactory.algol60.net/csm-docker/stable/cray-nexus-setup
-    tag: 0.11.1
+    tag: 0.12.1
     pullPolicy: IfNotPresent
   adminCredential:
     enabled: true
