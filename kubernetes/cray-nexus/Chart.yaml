@@ -24,7 +24,7 @@
 ---
 apiVersion: v2
 name: cray-nexus
-version: 0.14.1
+version: 0.14.2
 description: Sonatype Nexus is an open source repository manager
 keywords:
   - sonatype
