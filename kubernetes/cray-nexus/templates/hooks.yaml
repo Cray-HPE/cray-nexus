@@ -112,9 +112,9 @@ spec:
             . "$(command -v nexus-ready)"
 
             # Make sure the rest of the nexus apis are ready
-            while [[ "$(curl -sfk -w '%{http_code}' -o /dev/null "${URL}/v1/status/check")" -gt 500 ]]
+            while [[ "$(curl -sk -w '%{http_code}' -o /dev/null "${URL}/v1/status/check")" -gt 500 ]]
             do
-                eecho >&2 "Trying again in 10 seconds"
+                echo >&2 "Trying again in 10 seconds"
                 sleep 10
             done
 
