@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2020-2024 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2020-2025 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -111,7 +111,14 @@ spec:
 
             . "$(command -v nexus-ready)"
 
-            # Change default admin password, as necessary
+            # Make sure the rest of the nexus apis are ready
+            while [[ "$(curl -sk -w '%{http_code}' -o /dev/null "${URL}/v1/status/check")" -gt 500 ]]
+            do
+                echo >&2 "Trying again in 10 seconds"
+                sleep 10
+            done
+
+            # Change default admin password, as necessary (this will only return 200 if the password is not changed)
             if curl -sfk "${URL}/v1/status/check"; then
                 echo "$NEXUS_ADMIN_PASSWORD" | nexus-change-password admin >&2
             fi
