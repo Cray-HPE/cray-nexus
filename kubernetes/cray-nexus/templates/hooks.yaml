@@ -118,9 +118,15 @@ spec:
                 sleep 10
             done
 
-            # Change default admin password, as necessary (this will only return 200 if the password is not changed)
-            if curl -sfk "${URL}/v1/status/check"; then
+            # change default admin password, as necessary
+            return_code=$(curl -sk -w "%{http_code}" "${url}/v1/status/check")
+            if [ "${return_code}" == "401" ]; then
+                echo "Nexus password is already changed"
+            elif [ "${return_code}" == "200" ]; then
                 echo "$NEXUS_ADMIN_PASSWORD" | nexus-change-password admin >&2
+            else
+                echo >&2 "Error: Nexus API not ready, returned ${return_code}"
+                return 1
             fi
 
 {{- end }}
