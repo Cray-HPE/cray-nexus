@@ -119,7 +119,7 @@ spec:
             done
 
             # change default admin password, as necessary
-            return_code=$(curl -sk -w "%{http_code}" "${url}/v1/status/check")
+            return_code=$(curl -sk -w "%{http_code}" "${URL}/v1/status/check")
             if [ "${return_code}" == "401" ]; then
                 echo "Nexus password is already changed"
             elif [ "${return_code}" == "200" ]; then
