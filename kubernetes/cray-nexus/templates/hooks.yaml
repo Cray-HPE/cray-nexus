@@ -114,19 +114,20 @@ spec:
             # Make sure the rest of the nexus apis are ready
             while [[ "$(curl -sk -w '%{http_code}' -o /dev/null "${URL}/v1/status/check")" -gt 500 ]]
             do
+                echo >&2 "${URL}/v1/status/check is not ready"
                 echo >&2 "Trying again in 10 seconds"
                 sleep 10
             done
 
             # change default admin password, as necessary
-            return_code=$(curl -sk -w "%{http_code}" "${URL}/v1/status/check")
+            return_code=$(curl -sk -w "%{http_code}" -o /dev/null "${URL}/v1/status/check")
             if [ "${return_code}" == "401" ]; then
                 echo "Nexus password is already changed"
             elif [ "${return_code}" == "200" ]; then
                 echo "$NEXUS_ADMIN_PASSWORD" | nexus-change-password admin >&2
             else
                 echo >&2 "Error: Nexus API not ready, returned ${return_code}"
-                return 1
+                exit 1
             fi
 
 {{- end }}
